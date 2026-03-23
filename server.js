@@ -12,18 +12,21 @@ app.use(express.json());
 const users = [
   {
     id: 1,
+    name: "Korben Dallas",
     email: "korben@fhloston.com",
     password: "multipass",
     picture: "/images/korben.png",
   },
   {
     id: 2,
+    name: "Leeloo",
     email: "leeloo@fhloston.com",
     password: "leeloo123",
     picture: "/images/leeloo.png",
   },
   {
     id: 3,
+    name: "Ruby Rhod",
     email: "ruby@fhloston.com",
     password: "greenrocks",
     picture: "/images/ruby.png",
@@ -43,7 +46,7 @@ app.post("/api/login", (req, res) => {
     expiresIn: "1h",
   });
 
-  res.json({ token, user: { id: user.id, email: user.email, picture: user.picture } });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, picture: user.picture } });
 });
 
 app.listen(PORT, () => {

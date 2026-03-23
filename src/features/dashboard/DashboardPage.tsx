@@ -30,7 +30,7 @@ export function DashboardPage() {
                     className="mx-auto h-32 w-32 rounded-full shadow-md"
                 />
                 <h1 className="text-xl font-semibold">
-                    Welcome, {auth.user.email}
+                    Welcome, {auth.user.name} &lt;{auth.user.email}&gt;
                 </h1>
                 <button
                     onClick={handleLogout}
