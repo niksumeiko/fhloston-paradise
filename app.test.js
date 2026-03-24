@@ -1,4 +1,5 @@
 const request = require("supertest");
+const jwt = require("jsonwebtoken");
 const app = require("./app");
 
 describe("The boarding gate", () => {
@@ -69,5 +70,17 @@ describe("The boarding gate", () => {
         picture: "/images/ruby.png",
       },
     });
+  });
+
+  it("provides a boarding token containing the passenger identity", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "korben@fhloston.com", password: "multipass" });
+
+    const payload = jwt.verify(response.body.token, "fhloston-paradise-secret");
+
+    expect(payload).toEqual(
+      expect.objectContaining({ id: 1, email: "korben@fhloston.com" })
+    );
   });
 });
