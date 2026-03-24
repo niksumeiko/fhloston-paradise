@@ -19,4 +19,21 @@ describe("The boarding gate", () => {
     expect(response.status).toBe(401);
     expect(response.body).toEqual({ message: "Invalid email or password" });
   });
+
+  it("grants Korben Dallas access with valid credentials", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "korben@fhloston.com", password: "multipass" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      token: expect.any(String),
+      user: {
+        id: 1,
+        name: "Korben Dallas",
+        email: "korben@fhloston.com",
+        picture: "/images/korben.png",
+      },
+    });
+  });
 });
