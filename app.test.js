@@ -83,4 +83,12 @@ describe("The boarding gate", () => {
       expect.objectContaining({ id: 1, email: "korben@fhloston.com" })
     );
   });
+
+  it("never exposes passenger password in the response", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "korben@fhloston.com", password: "multipass" });
+
+    expect(response.body.user).not.toHaveProperty("password");
+  });
 });
