@@ -53,4 +53,21 @@ describe("The boarding gate", () => {
       },
     });
   });
+
+  it("grants Ruby Rhod access with valid credentials", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "ruby@fhloston.com", password: "greenrocks" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      token: expect.any(String),
+      user: {
+        id: 3,
+        name: "Ruby Rhod",
+        email: "ruby@fhloston.com",
+        picture: "/images/ruby.png",
+      },
+    });
+  });
 });
