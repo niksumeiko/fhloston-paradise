@@ -17,7 +17,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "*.test.ts", "e2e"]
 }
