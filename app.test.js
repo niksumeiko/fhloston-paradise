@@ -10,4 +10,13 @@ describe("The boarding gate", () => {
     expect(response.status).toBe(401);
     expect(response.body).toEqual({ message: "Invalid email or password" });
   });
+
+  it("rejects a known passenger with wrong password", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "korben@fhloston.com", password: "wrongpassword" });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ message: "Invalid email or password" });
+  });
 });
