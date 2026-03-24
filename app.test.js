@@ -36,4 +36,21 @@ describe("The boarding gate", () => {
       },
     });
   });
+
+  it("grants Leeloo access with valid credentials", async () => {
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "leeloo@fhloston.com", password: "leeloo123" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      token: expect.any(String),
+      user: {
+        id: 2,
+        name: "Leeloo",
+        email: "leeloo@fhloston.com",
+        picture: "/images/leeloo.png",
+      },
+    });
+  });
 });
