@@ -1,22 +1,19 @@
 interface TextInputProps {
     id: string;
     type?: string;
-    value: string;
-    onChange: (value: string) => void;
+    name: string
 }
 
 export function TextInput({
     id,
     type = 'text',
-    value,
-    onChange,
+    name
 }: TextInputProps) {
     return (
         <input
             id={id}
             type={type}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
+            name={name}
             className="w-full rounded border px-3 py-2"
         />
     );

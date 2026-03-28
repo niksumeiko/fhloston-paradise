@@ -1,6 +1,5 @@
-import { type FormEvent, useState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 import { getAuth, setAuth } from './AuthService';
 import {
     Alert,
@@ -11,98 +10,66 @@ import {
     Button,
 } from '../../design-system';
 
+import { LoginActionResponse } from '../../types';
+import { login } from '../lib/login';
+
+const initialState: LoginActionResponse = {
+    success: false,
+    message: '',
+    token: undefined,
+    user: undefined,
+    errors: undefined
+}
 export function LoginPage() {
+    const [state, dispatchAction, isPending] = useActionState(login, initialState)
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-    const [apiError, setApiError] = useState('');
+    const { success, token, user } = state
+    useEffect(() => {
+        if (success && token && user) {
+            console.log(user, 'use effect')
+            setAuth(token, user)
+            navigate('/')
+        }
+    }, [success, token, user, navigate])
 
     if (getAuth()) {
         return <Navigate to="/" replace />;
     }
 
-    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setFieldErrors({});
-        setApiError('');
-
-        const result = z
-            .object({
-                email: z.string().email('Please enter a valid email'),
-                password: z
-                    .string()
-                    .min(6, 'Password must be at least 6 characters'),
-            })
-            .safeParse({ email, password });
-
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            for (const issue of result.error.issues) {
-                const field = issue.path[0] as string;
-                errors[field] = issue.message;
-            }
-            setFieldErrors(errors);
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:3001/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message);
-            }
-
-            const { token, user } = await response.json();
-            setAuth(token, user);
-            navigate('/');
-        } catch (err) {
-            setApiError(
-                err instanceof Error ? err.message : 'Something went wrong',
-            );
-        }
-    }
 
     return (
         <CardLayout>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form action={dispatchAction} className="space-y-6">
                 <Title>Authenticate</Title>
 
                 <FormField
                     label="Email"
                     htmlFor="email"
-                    error={fieldErrors.email}
+                    error={state?.errors?.email?.[0]}
                 >
                     <TextInput
                         id="email"
-                        value={email}
-                        onChange={setEmail}
+                        name='email'
                     />
                 </FormField>
 
                 <FormField
                     label="Password"
                     htmlFor="password"
-                    error={fieldErrors.password}
+                    error={state?.errors?.password?.[0]}
                 >
                     <TextInput
                         id="password"
                         type="password"
-                        value={password}
-                        onChange={setPassword}
+                        name='password'
                     />
                 </FormField>
 
-                {apiError && (
-                    <Alert variant="error">{apiError}</Alert>
+                {state.message && !state.success && (
+                    <Alert variant="error">{state.message}</Alert>
                 )}
 
-                <Button type="submit">Login</Button>
+                <Button type="submit">{isPending ? 'Processing...' : 'Login'}</Button>
             </form>
         </CardLayout>
     );

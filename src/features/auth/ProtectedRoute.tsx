@@ -4,6 +4,7 @@ import { getAuth } from './AuthService';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
     const auth = getAuth();
+    console.log({ auth })
 
     if (!auth) {
         return <Navigate to="/login" replace />;
