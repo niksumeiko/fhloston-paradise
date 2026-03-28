@@ -17,7 +17,7 @@ export function Button({
     children,
     type = 'button',
     variant = 'primary',
-    onClick,
+    onClick
 }: ButtonProps) {
     return (
         <button type={type} onClick={onClick} className={styles[variant]}>
