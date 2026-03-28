@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { getAuth, setAuth } from './AuthService';
+import { useAuthAdapter } from './AuthContext';
 import {
     Alert,
     CardLayout,
@@ -13,6 +14,7 @@ import {
 
 export function LoginPage() {
     const navigate = useNavigate();
+    const auth = useAuthAdapter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -47,18 +49,7 @@ export function LoginPage() {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message);
-            }
-
-            const { token, user } = await response.json();
+            const { token, user } = await auth.login(email, password);
             setAuth(token, user);
             navigate('/');
         } catch (err) {

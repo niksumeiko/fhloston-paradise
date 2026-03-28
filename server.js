@@ -33,6 +33,8 @@ const users = [
   },
 ];
 
+app.get("/api/health", (req, res) => res.sendStatus(200));
+
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
 
