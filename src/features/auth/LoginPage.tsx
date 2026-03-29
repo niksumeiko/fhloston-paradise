@@ -1,88 +1,57 @@
 import { type FormEvent, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 import { getAuth, setAuth } from './AuthService';
 import {
     Alert,
+    Button,
     CardLayout,
-    Title,
     FormField,
     TextInput,
-    Button,
+    Title,
 } from '../../design-system';
+import { authenticate, validateFormInput } from './LoginPageService.ts';
 
 export function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-    const [apiError, setApiError] = useState('');
+    const [apiError, setApiError] = useState<string | null>(null);
 
     if (getAuth()) {
         return <Navigate to="/" replace />;
     }
 
-    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFieldErrors({});
         setApiError('');
 
-        const result = z
-            .object({
-                email: z.string().email('Please enter a valid email'),
-                password: z
-                    .string()
-                    .min(6, 'Password must be at least 6 characters'),
-            })
-            .safeParse({ email, password });
-
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            for (const issue of result.error.issues) {
-                const field = issue.path[0] as string;
-                errors[field] = issue.message;
-            }
+        const { isFormInputValid, errors } = validateFormInput(email, password);
+        if (!isFormInputValid) {
             setFieldErrors(errors);
             return;
         }
 
-        try {
-            const response = await fetch('http://localhost:3001/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message);
+        authenticate(email, password).then((result) => {
+            if (result.isAuthenticated) {
+                const { token, user } = result;
+                setAuth(token, user);
+                navigate('/');
+            } else {
+                const { error } = result;
+                setApiError(error.message);
             }
-
-            const { token, user } = await response.json();
-            setAuth(token, user);
-            navigate('/');
-        } catch (err) {
-            setApiError(
-                err instanceof Error ? err.message : 'Something went wrong',
-            );
-        }
-    }
+        });
+    };
 
     return (
         <CardLayout>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <Title>Authenticate</Title>
 
-                <FormField
-                    label="Email"
-                    htmlFor="email"
-                    error={fieldErrors.email}
-                >
-                    <TextInput
-                        id="email"
-                        value={email}
-                        onChange={setEmail}
-                    />
+                <FormField label="Email" htmlFor="email" error={fieldErrors.email}>
+                    <TextInput id="email" value={email} onChange={setEmail} />
                 </FormField>
 
                 <FormField
@@ -99,10 +68,14 @@ export function LoginPage() {
                 </FormField>
 
                 {apiError && (
-                    <Alert variant="error">{apiError}</Alert>
+                    <Alert id="login" variant="error">
+                        {apiError}
+                    </Alert>
                 )}
 
-                <Button type="submit">Login</Button>
+                <Button id="login" type="submit">
+                    Login
+                </Button>
             </form>
         </CardLayout>
     );

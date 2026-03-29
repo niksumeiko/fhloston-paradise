@@ -1,14 +1,14 @@
 const TOKEN_KEY = 'token';
 const USER_KEY = 'user';
 
-interface User {
+export interface User {
     id: number;
     name: string;
     email: string;
     picture: string;
 }
 
-interface Auth {
+export interface Auth {
     token: string;
     user: User;
 }

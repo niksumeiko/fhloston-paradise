@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 
 interface ButtonProps {
     children: ReactNode;
+    id?: string;
     type?: 'button' | 'submit';
     variant?: 'primary' | 'secondary';
     onClick?: () => void;
@@ -15,12 +16,13 @@ const styles = {
 
 export function Button({
     children,
+    id,
     type = 'button',
     variant = 'primary',
     onClick,
 }: ButtonProps) {
     return (
-        <button type={type} onClick={onClick} className={styles[variant]}>
+        <button id={id} type={type} onClick={onClick} className={styles[variant]}>
             {children}
         </button>
     );

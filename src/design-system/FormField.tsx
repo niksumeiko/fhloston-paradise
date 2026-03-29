@@ -15,7 +15,7 @@ export function FormField({ label, htmlFor, error, children }: FormFieldProps) {
                 {label}
             </label>
             {children}
-            {error && <Alert variant="error">{error}</Alert>}
+            {error && <Alert id={htmlFor} variant="error">{error}</Alert>}
         </div>
     );
 }
