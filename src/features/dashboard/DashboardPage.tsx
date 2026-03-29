@@ -39,7 +39,7 @@ export function DashboardPage() {
                     Welcome, {auth.user.name} &lt;{auth.user.email}&gt;
                 </UserDescription>
             </UserCard>
-            <Button variant="secondary" onClick={handleLogout}>
+            <Button id="logout" variant="secondary" onClick={handleLogout}>
                 Logout
             </Button>
         </CardLayout>
