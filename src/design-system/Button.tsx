@@ -5,11 +5,11 @@ interface ButtonProps {
     type?: 'button' | 'submit';
     variant?: 'primary' | 'secondary';
     onClick?: () => void;
+    'data-cy'?: string;
 }
 
 const styles = {
-    primary:
-        'w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700',
+    primary: 'w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700',
     secondary: 'rounded bg-gray-200 px-4 py-2 hover:bg-gray-300',
 };
 
@@ -18,9 +18,15 @@ export function Button({
     type = 'button',
     variant = 'primary',
     onClick,
+    'data-cy': dataCy,
 }: ButtonProps) {
     return (
-        <button type={type} onClick={onClick} className={styles[variant]}>
+        <button
+            type={type}
+            onClick={onClick}
+            className={styles[variant]}
+            data-cy={dataCy}
+        >
             {children}
         </button>
     );

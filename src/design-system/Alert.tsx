@@ -10,5 +10,9 @@ const styles = {
 };
 
 export function Alert({ variant, children }: AlertProps) {
-    return <p className={styles[variant]}>{children}</p>;
+    return (
+        <p data-cy="alert" className={styles[variant]}>
+            {children}
+        </p>
+    );
 }
