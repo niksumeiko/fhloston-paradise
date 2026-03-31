@@ -31,15 +31,12 @@ export function DashboardPage() {
     return (
         <CardLayout>
             <UserCard>
-                <UserPicture
-                    src={auth.user.picture}
-                    alt={auth.user.name}
-                />
+                <UserPicture src={auth.user.picture} alt={auth.user.name} />
                 <UserDescription>
                     Welcome, {auth.user.name} &lt;{auth.user.email}&gt;
                 </UserDescription>
             </UserCard>
-            <Button variant="secondary" onClick={handleLogout}>
+            <Button data-cy="logout" variant="secondary" onClick={handleLogout}>
                 Logout
             </Button>
         </CardLayout>
