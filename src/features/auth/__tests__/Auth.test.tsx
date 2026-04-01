@@ -49,4 +49,29 @@ describe('Authentication', () => {
 
         cy.contains('Invalid credentials').should('be.visible');
     });
+
+    it('logs out from the dashboard', () => {
+        localStorage.setItem('token', 'fhloston-token');
+        localStorage.setItem(
+            'user',
+            JSON.stringify({
+                id: 2,
+                name: 'Leeloo',
+                email: 'leeloo@fhloston.com',
+                picture: '/leeloo.jpg',
+            }),
+        );
+
+        cy.mount(<App />, '/');
+
+        cy.url().should('equal', '/');
+        cy.contains('Leeloo').should('be.visible');
+
+        cy.findByRole('button', { name: 'Logout' }).click();
+
+        cy.url().should('include', '/login');
+        cy.findByRole('heading', { name: 'Authenticate' }).should(
+            'be.visible',
+        );
+    });
 });
