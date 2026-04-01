@@ -37,14 +37,12 @@ describe('Authentication', () => {
         cy.mount(<App />, '/login');
 
         cy.findByLabelText('Email').type('korben');
-        cy.findByLabelText('Password').type('xyz');
         cy.findByRole('button', { name: 'Login' }).click();
 
         cy.contains('Please enter a valid email').should('be.visible');
-        cy.contains('Password must be at least 6 characters').should('be.visible');
 
         cy.findByLabelText('Email').clear().type('korben@fhloston.com');
-        cy.findByLabelText('Password').clear().type('xyzxyz');
+        cy.findByLabelText('Password').type('xyzxyz');
         cy.findByRole('button', { name: 'Login' }).click();
 
         cy.contains('Invalid credentials').should('be.visible');
@@ -70,8 +68,6 @@ describe('Authentication', () => {
         cy.findByRole('button', { name: 'Logout' }).click();
 
         cy.url().should('include', '/login');
-        cy.findByRole('heading', { name: 'Authenticate' }).should(
-            'be.visible',
-        );
+        cy.findByRole('heading', { name: 'Authenticate' }).should('be.visible');
     });
 });

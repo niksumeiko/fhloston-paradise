@@ -1,7 +1,8 @@
 import { type FormEvent, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 import { getAuth, setAuth } from './AuthService';
+import { validateLoginForm } from './LoginPageService';
+import { login } from '../../domain/user/AuthAdapter';
 import {
     Alert,
     CardLayout,
@@ -27,44 +28,19 @@ export function LoginPage() {
         setFieldErrors({});
         setApiError('');
 
-        const result = z
-            .object({
-                email: z.string().email('Please enter a valid email'),
-                password: z
-                    .string()
-                    .min(6, 'Password must be at least 6 characters'),
-            })
-            .safeParse({ email, password });
+        const errors = validateLoginForm({ email, password });
 
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            for (const issue of result.error.issues) {
-                const field = issue.path[0] as string;
-                errors[field] = issue.message;
-            }
+        if (errors) {
             setFieldErrors(errors);
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message);
-            }
-
-            const { token, user } = await response.json();
+            const { token, user } = await login(email, password);
             setAuth(token, user);
             navigate('/');
         } catch (err) {
-            setApiError(
-                err instanceof Error ? err.message : 'Something went wrong',
-            );
+            setApiError((err as Error).message);
         }
     }
 
