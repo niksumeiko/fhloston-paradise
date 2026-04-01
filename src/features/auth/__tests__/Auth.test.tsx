@@ -1,24 +1,35 @@
 import App from '../../../App';
+import { createAuthProvider } from '../../../domain/user/AuthProvider.ts';
+import { ContextProvider } from '../../../common/context';
+import { AuthResponse } from '../../../domain/user/AuthAdapter.ts';
 
 describe('Authentication', () => {
-    beforeEach(() => {
-        localStorage.clear();
-    });
-
     it('successfully authorize', () => {
-        cy.intercept('POST', '**/api/login**', {
-            body: {
-                token: 'fhloston-token',
-                user: {
-                    id: 1,
-                    name: 'Korben Dallas',
-                    email: 'korben@fhloston.com',
-                    picture: '/korben.jpg',
-                },
-            },
-        });
+        let data: AuthResponse | null = null;
+        const fake = {
+            getAuth: () => data,
+            login: () => {
+                data = {
+                    token: 'fhloston-token',
+                    user: {
+                        id: 1,
+                        name: 'Korben Dallas',
+                        email: 'korben@fhloston.com',
+                        picture: '/korben.jpg',
+                    },
+                };
 
-        cy.mount(<App />, '/');
+                return Promise.resolve(data);
+            },
+            logout: () => {},
+        };
+
+        cy.mount(
+            <ContextProvider providers={[createAuthProvider(fake)]}>
+                <App />
+            </ContextProvider>,
+            '/',
+        );
 
         cy.findByLabelText('Email').type('korben@fhloston.com');
         cy.findByLabelText('Password').type('xyzxyz');
@@ -29,12 +40,20 @@ describe('Authentication', () => {
     });
 
     it('see errors for invalid credentials', () => {
-        cy.intercept('POST', '**/api/login**', {
-            statusCode: 401,
-            body: { message: 'Invalid credentials' },
-        });
+        const fake = {
+            getAuth: () => null,
+            login: () => {
+                return Promise.reject({ message: 'Invalid credentials' });
+            },
+            logout: () => {},
+        };
 
-        cy.mount(<App />, '/login');
+        cy.mount(
+            <ContextProvider providers={[createAuthProvider(fake)]}>
+                <App />
+            </ContextProvider>,
+            '/',
+        );
 
         cy.findByLabelText('Email').type('korben');
         cy.findByRole('button', { name: 'Login' }).click();
@@ -49,18 +68,29 @@ describe('Authentication', () => {
     });
 
     it('logs out from the dashboard', () => {
-        localStorage.setItem('token', 'fhloston-token');
-        localStorage.setItem(
-            'user',
-            JSON.stringify({
+        let data: AuthResponse | null = {
+            token: 'fhloston-token',
+            user: {
                 id: 2,
                 name: 'Leeloo',
                 email: 'leeloo@fhloston.com',
                 picture: '/leeloo.jpg',
-            }),
-        );
+            },
+        };
+        const fake = {
+            getAuth: () => data,
+            login: () => Promise.reject(),
+            logout: () => {
+                data = null;
+            },
+        };
 
-        cy.mount(<App />, '/');
+        cy.mount(
+            <ContextProvider providers={[createAuthProvider(fake)]}>
+                <App />
+            </ContextProvider>,
+            '/',
+        );
 
         cy.url().should('equal', '/');
         cy.contains('Leeloo').should('be.visible');

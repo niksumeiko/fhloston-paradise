@@ -1,19 +1,19 @@
 import { type FormEvent, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { getAuth, setAuth } from './AuthService';
 import { validateLoginForm } from './LoginPageService';
-import { login } from '../../domain/user/AuthAdapter';
 import {
     Alert,
+    Button,
     CardLayout,
-    Title,
     FormField,
     TextInput,
-    Button,
+    Title,
 } from '../../design-system';
+import { useAuth } from '../../domain/user/AuthProvider.ts';
 
 export function LoginPage() {
     const navigate = useNavigate();
+    const { getAuth, login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -36,8 +36,7 @@ export function LoginPage() {
         }
 
         try {
-            const { token, user } = await login(email, password);
-            setAuth(token, user);
+            await login(email, password);
             navigate('/');
         } catch (err) {
             setApiError((err as Error).message);
@@ -49,16 +48,8 @@ export function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <Title>Authenticate</Title>
 
-                <FormField
-                    label="Email"
-                    htmlFor="email"
-                    error={fieldErrors.email}
-                >
-                    <TextInput
-                        id="email"
-                        value={email}
-                        onChange={setEmail}
-                    />
+                <FormField label="Email" htmlFor="email" error={fieldErrors.email}>
+                    <TextInput id="email" value={email} onChange={setEmail} />
                 </FormField>
 
                 <FormField
@@ -74,9 +65,7 @@ export function LoginPage() {
                     />
                 </FormField>
 
-                {apiError && (
-                    <Alert variant="error">{apiError}</Alert>
-                )}
+                {apiError && <Alert variant="error">{apiError}</Alert>}
 
                 <Button type="submit">Login</Button>
             </form>

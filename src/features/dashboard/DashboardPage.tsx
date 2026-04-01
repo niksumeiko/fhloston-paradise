@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, clearAuth } from '../auth/AuthService';
 import {
+    Button,
     CardLayout,
     UserCard,
-    UserPicture,
     UserDescription,
-    Button,
+    UserPicture,
 } from '../../design-system';
+import { useAuth } from '../../domain/user/AuthProvider.ts';
 
 export function DashboardPage() {
     const navigate = useNavigate();
+    const { getAuth, logout } = useAuth();
     const auth = getAuth();
 
     useEffect(() => {
@@ -24,17 +25,14 @@ export function DashboardPage() {
     }
 
     const handleLogout = () => {
-        clearAuth();
+        logout();
         navigate('/login');
     };
 
     return (
         <CardLayout>
             <UserCard>
-                <UserPicture
-                    src={auth.user.picture}
-                    alt={auth.user.name}
-                />
+                <UserPicture src={auth.user.picture} alt={auth.user.name} />
                 <UserDescription>
                     Welcome, {auth.user.name} &lt;{auth.user.email}&gt;
                 </UserDescription>
