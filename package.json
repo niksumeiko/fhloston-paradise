@@ -4,14 +4,16 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "concurrently -k -s first -n api,app \"node server.js\" \"vite\"",
     "start:api": "node server.js",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint 'src/**/*.{ts,tsx}' --report-unused-disable-directives --fix",
-    "format": "prettier --write 'src/**/*.{ts,tsx,css,md}'"
+    "format": "prettier --write 'src/**/*.{ts,tsx,css,md}'",
+    "test:unit": "vitest run --sequence.concurrent --sequence.shuffle.tests",
+    "test:integration": "cypress open --component --browser electron",
+    "test:integration:headless": "cypress run --component --browser electron --config video=false"
   },
   "keywords": [],
   "author": "",
@@ -27,21 +29,25 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^10.1.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.27",
     "concurrently": "^9.2.1",
+    "cypress": "^15.13.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "msw": "^2.12.14",
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vite": "^8.0.2"
+    "vite": "^7.3.1",
+    "vitest": "^4.1.2"
   }
 }
