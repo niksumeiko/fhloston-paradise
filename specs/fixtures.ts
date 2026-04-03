@@ -1,7 +1,7 @@
 import { test as base, expect, type Page } from '@playwright/test';
 
 class LoginPageModel {
-    constructor(private readonly page: Page) {}
+    constructor(readonly page: Page) {}
 
     async goto() {
         await this.page.goto('/login');
