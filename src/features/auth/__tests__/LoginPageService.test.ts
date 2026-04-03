@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { validateLoginForm } from '../LoginPageService';
 
 describe('LoginPageService', () => {
