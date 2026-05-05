@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { getAuth } from './AuthService';
+import { useLogin } from './useLogin';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
+    const { getAuth } = useLogin();
     const auth = getAuth();
 
     if (!auth) {
